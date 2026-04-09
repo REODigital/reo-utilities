@@ -170,7 +170,7 @@
 <body>
   <div class="app">
     <div class="header">
-      <h1>Competency Radar Builder</h1>
+      <h1>Competency Radar Chart Builder</h1>
       <p>Select a role and mode, rate each item, then copy and paste the radar chart into a Confluence page.</p>
     </div>
 
@@ -248,14 +248,16 @@
     };
     const DATASET_STYLES = {
       expected: {
-        borderColor: '#1d4ed8',
-        backgroundColor: 'rgba(37, 99, 235, 0.20)',
-        pointBackgroundColor: '#1d4ed8',
+        borderColor: '#60a5fa',
+        backgroundColor: 'rgba(37, 99, 235, 0.12)',
+        pointRadius: 0,
+        pointHoverRadius: 0,
       },
       actual: {
-        borderColor: '#0f766e',
-        backgroundColor: 'rgba(13, 148, 136, 0.20)',
-        pointBackgroundColor: '#0f766e',
+        borderColor: '#2dd4bf',
+        backgroundColor: 'rgba(13, 148, 136, 0.12)',
+        pointRadius: 0,
+        pointHoverRadius: 0,
       },
     };
     const TOAST_DURATION = 2200;
@@ -279,7 +281,6 @@
         label,
         data,
         ...style,
-        pointRadius: 2,
         borderWidth: 2,
       };
     }
@@ -362,12 +363,12 @@
             title: {
               display: true,
               text: `Role: ${meta.role} | Role level: ${meta.roleLevel}`,
-              font: { size: 16 },
+              font: { size: 20 },
             },
             subtitle: {
               display: true,
               text: `Assessment: ${meta.assessment} | Assessment date: ${meta.assessmentDate}`,
-              font: { size: 12 },
+              font: { size: 15 },
             },
             legend: {
               position: 'bottom',
@@ -379,6 +380,9 @@
               max: 5,
               ticks: {
                 stepSize: 1,
+              },
+              pointLabels: {
+                font: { size: 14 },
               },
             },
           },
