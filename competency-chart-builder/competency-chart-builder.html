@@ -232,11 +232,68 @@
       sales: ['Prospecting','Cold outreach','Product knowledge','CRM hygiene','Discovery calls','Follow-up','Pipeline mgmt'],
     };
 
-    // Expected benchmark scores by role level, used as data1 in the chart URL.
-    const EXPECTED_SCORES_BY_LEVEL = {
-      standard: 3,
-      senior: 4,
-      lead: 5,
+    // Expected benchmark scores by role and level. Each array corresponds to items in the role.
+    const EXPECTED_SCORES_BY_ROLE_LEVEL = {
+      dev: {
+        values: {
+          standard: [3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5],
+        },
+        skills: {
+          standard: [3, 3, 3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5, 5, 5],
+        },
+      },
+      qa: {
+        values: {
+          standard: [3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5],
+        },
+        skills: {
+          standard: [3, 3, 3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5, 5, 5],
+        },
+      },
+      analytics: {
+        values: {
+          standard: [3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5],
+        },
+        skills: {
+          standard: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
+        },
+      },
+      cx: {
+        values: {
+          standard: [3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5],
+        },
+        skills: {
+          standard: [3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5],
+        },
+      },
+      sales: {
+        values: {
+          standard: [3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5],
+        },
+        skills: {
+          standard: [3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5],
+        },
+      },
     };
 
     const QUICKCHART_URL = 'https://quickchart.io/chart';
@@ -338,9 +395,18 @@
 
     function buildUrl(includeActual = false) {
       const items = getItems();
+      const mode = document.getElementById('mode-select').value;
       const level = document.getElementById('level-select').value;
-      const expectedScore = EXPECTED_SCORES_BY_LEVEL[level] ?? 0;
-      const expectedData = items.map(() => expectedScore);
+      const role = document.getElementById('role-select').value;
+      
+      // Determine which key to use for expected scores
+      let expectedData;
+      if (mode === 'values') {
+        expectedData = EXPECTED_SCORES_BY_ROLE_LEVEL[role]?.values?.[level] ?? items.map(() => 0);
+      } else {
+        expectedData = EXPECTED_SCORES_BY_ROLE_LEVEL[role]?.skills?.[level] ?? items.map(() => 0);
+      }
+      
       const actualData = items.map(i => ratings[i] ?? 0);
       const meta = getChartMeta();
 
