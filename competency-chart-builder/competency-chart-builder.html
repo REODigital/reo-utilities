@@ -135,7 +135,7 @@
 
     .score-summary {
       border: 0.5px solid var(--border);
-      background: var(--surface);
+      background: var(--surface2);
       border-radius: var(--radius);
       padding: 12px 14px;
       margin-bottom: 12px;
@@ -582,7 +582,7 @@
       const heading = `Assigned scores (${rated}/${summaryEntries.length} rated)`;
 
       const padX = 24;
-      const topY = 26;
+      const topY = 34;
       const headingLineHeight = 36;
       const textLineHeight = 30;
       const scoreCircleSize = 30;
@@ -607,9 +607,8 @@
       const rowsHeight = measuredRows.reduce((sum, row, index) =>
         sum + row.rowHeight + (index < measuredRows.length - 1 ? rowGap : 0), 0
       );
-      const bottomRuleGap = 20;
-      const summaryHeight = topY + headingLineHeight + 12 + rowsHeight + bottomRuleGap;
-      const dividerGap = 10;
+      const summaryHeight = topY + headingLineHeight + 44 + rowsHeight + 18;
+      const dividerGap = 1;
       const summaryTop = chartImg.height + dividerGap;
 
       canvas.height = chartImg.height + dividerGap + summaryHeight;
@@ -619,13 +618,15 @@
 
       ctx.drawImage(chartImg, 0, 0);
 
-      // horizontal rule
-      ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(padX, chartImg.height + (dividerGap / 2));
-      ctx.lineTo(canvas.width - padX, chartImg.height + (dividerGap / 2));
-      ctx.stroke();
+      const summaryContainerX = summaryLeft - 30;
+      const summaryContainerY = summaryTop + 1;
+      const summaryContainerWidth = summaryTableWidth + 60;
+      const summaryContainerHeight = summaryHeight - 2;
+      ctx.fillStyle = '#f3f4f6';
+      ctx.fillRect(summaryContainerX, summaryContainerY, summaryContainerWidth, summaryContainerHeight);
+      ctx.strokeStyle = '#d1d5db';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(summaryContainerX, summaryContainerY, summaryContainerWidth, summaryContainerHeight);
 
       ctx.fillStyle = '#334155';
       ctx.font = '600 24px DM Sans, sans-serif';
@@ -636,7 +637,7 @@
       ctx.font = '500 22px DM Sans, sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      let cursorY = summaryTop + topY + headingLineHeight + 12;
+      let cursorY = summaryTop + topY + headingLineHeight + 20;
       measuredRows.forEach(row => {
         const textBlockHeight = row.lines.length * textLineHeight;
         const lineStartY = cursorY + ((row.rowHeight - textBlockHeight) / 2) + (textLineHeight / 2);
@@ -667,14 +668,6 @@
 
         cursorY += row.rowHeight + rowGap;
       });
-
-      // horizontal rule below scores table
-      ctx.strokeStyle = '#e2e8f0';
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(padX, cursorY + (bottomRuleGap / 2) - rowGap);
-      ctx.lineTo(canvas.width - padX, cursorY + (bottomRuleGap / 2) - rowGap);
-      ctx.stroke();
 
       ctx.textBaseline = 'alphabetic';
       return canvasToPngBlob(canvas);
