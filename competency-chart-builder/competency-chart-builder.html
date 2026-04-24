@@ -51,6 +51,30 @@
       margin: 0 auto;
     }
 
+    .browser-note {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      border-radius: var(--radius-sm);
+      border: 0.5px solid var(--border2);
+      background: var(--surface);
+      color: var(--text2);
+      font-size: 13px;
+    }
+
+    .chrome-logo {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, #3b82f6 0 30%, transparent 32%),
+        conic-gradient(#ea4335 0 33%, #fbbc05 33% 66%, #34a853 66% 100%);
+      border: 0.5px solid rgba(0, 0, 0, 0.15);
+      flex-shrink: 0;
+    }
+
     .header { margin-bottom: 2rem; }
     .header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; margin-bottom: 4px; }
     .header p { font-size: 13px; color: var(--text2); }
@@ -234,6 +258,11 @@
 </head>
 <body>
   <div class="app">
+    <div class="browser-note" role="note" aria-label="Browser recommendation">
+      <span class="chrome-logo" aria-hidden="true"></span>
+      <span>For the best experience, use Google Chrome.</span>
+    </div>
+
     <div class="header">
       <h1>Assessment Chart Builder</h1>
       <p>Select a role, role level and assessment type, rate each item, then copy and paste the radar chart into a Confluence page.</p>
