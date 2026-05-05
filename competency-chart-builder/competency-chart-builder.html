@@ -173,23 +173,35 @@
       margin-bottom: 8px;
     }
     .score-summary-table {
-      width: min(100%, 360px);
+      width: min(100%, 460px);
       margin: 0 auto;
       border-collapse: collapse;
       font-size: 12px;
       color: var(--text2);
       font-family: var(--mono);
     }
+    .score-summary-table th,
     .score-summary-table td {
       padding: 4px 0;
       vertical-align: middle;
+    }
+    .score-summary-table th {
+      color: var(--text3);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 500;
     }
     .score-summary-item-name {
       color: var(--text2);
       text-align: left;
     }
+    .score-summary-col-label {
+      text-align: right;
+      width: 56px;
+    }
     .score-summary-score-cell {
-      width: 40px;
+      width: 56px;
       text-align: right;
     }
     .score-summary-score {
@@ -529,8 +541,19 @@
 
     function renderScoreSummary() {
       const summaryEl = document.getElementById('score-summary');
-      const entries = getAssignedScoreEntries();
-      const rated = entries.filter(entry => entry.score > 0).length;
+      const items = getItems();
+      const mode = document.getElementById('mode-select').value;
+      const level = document.getElementById('level-select').value;
+      const role = document.getElementById('role-select').value;
+      const expectedScores = mode === 'values'
+        ? (EXPECTED_SCORES_BY_ROLE_LEVEL[role]?.values?.[level] ?? items.map(() => 0))
+        : (EXPECTED_SCORES_BY_ROLE_LEVEL[role]?.skills?.[level] ?? items.map(() => 0));
+      const entries = items.map((item, index) => ({
+        item,
+        expected: expectedScores[index] ?? 0,
+        actual: ratings[item] ?? 0,
+      }));
+      const rated = entries.filter(entry => entry.actual > 0).length;
 
       if (!entries.length) {
         summaryEl.innerHTML = '<div class="score-summary-empty">No items available for this selection.</div>';
@@ -538,14 +561,24 @@
       }
 
       summaryEl.innerHTML = `
-        <div class="score-summary-title">Assigned scores (${rated}/${entries.length} rated)</div>
+        <div class="score-summary-title">Expected vs Actual (${rated}/${entries.length} rated)</div>
         <table class="score-summary-table">
+          <thead>
+            <tr>
+              <th class="score-summary-item-name">Item</th>
+              <th class="score-summary-col-label">Expected</th>
+              <th class="score-summary-col-label">Actual</th>
+            </tr>
+          </thead>
           <tbody>
           ${entries.map(entry => `
             <tr>
               <td class="score-summary-item-name">${entry.item}</td>
               <td class="score-summary-score-cell">
-                <span class="score-summary-score ${entry.score ? '' : 'unrated'}" ${entry.score ? `data-score="${entry.score}"` : ''}>${entry.score || '-'}</span>
+                <span class="score-summary-score ${entry.expected ? '' : 'unrated'}" ${entry.expected ? `data-score="${entry.expected}"` : ''}>${entry.expected || '-'}</span>
+              </td>
+              <td class="score-summary-score-cell">
+                <span class="score-summary-score ${entry.actual ? '' : 'unrated'}" ${entry.actual ? `data-score="${entry.actual}"` : ''}>${entry.actual || '-'}</span>
               </td>
             </tr>`).join('')}
           </tbody>
@@ -607,9 +640,20 @@
 
     async function buildChartWithSummaryBlob(chartBlob) {
       const chartImg = await loadImageFromBlob(chartBlob);
-      const summaryEntries = getAssignedScoreEntries();
-      const rated = summaryEntries.filter(entry => entry.score > 0).length;
-      const heading = `Assigned scores (${rated}/${summaryEntries.length} rated)`;
+      const items = getItems();
+      const mode = document.getElementById('mode-select').value;
+      const level = document.getElementById('level-select').value;
+      const role = document.getElementById('role-select').value;
+      const expectedScores = mode === 'values'
+        ? (EXPECTED_SCORES_BY_ROLE_LEVEL[role]?.values?.[level] ?? items.map(() => 0))
+        : (EXPECTED_SCORES_BY_ROLE_LEVEL[role]?.skills?.[level] ?? items.map(() => 0));
+      const summaryEntries = items.map((item, index) => ({
+        item,
+        expected: expectedScores[index] ?? 0,
+        actual: ratings[item] ?? 0,
+      }));
+      const rated = summaryEntries.filter(entry => entry.actual > 0).length;
+      const heading = `Expected vs Actual (${rated}/${summaryEntries.length} rated)`;
 
       const padX = 24;
       const topY = 34;
@@ -617,7 +661,8 @@
       const textLineHeight = 30;
       const scoreCircleSize = 30;
       const rowGap = 12;
-      const scoreColWidth = 52;
+      const scoreColWidth = 64;
+      const scoreColGap = 18;
 
       const canvas = document.createElement('canvas');
       canvas.width = chartImg.width;
@@ -626,7 +671,8 @@
 
       const summaryTableWidth = Math.min(canvas.width - (padX * 2), 360);
       const summaryLeft = (canvas.width - summaryTableWidth) / 2;
-      const scoreColumnLeft = summaryLeft + summaryTableWidth - scoreColWidth;
+      const scoreColumnsWidth = (scoreColWidth * 2) + scoreColGap;
+      const scoreColumnLeft = summaryLeft + summaryTableWidth - scoreColumnsWidth;
       const maxTextWidth = scoreColumnLeft - summaryLeft - 10;
       ctx.font = '500 22px DM Sans, sans-serif';
       const measuredRows = summaryEntries.map(entry => {
@@ -637,7 +683,7 @@
       const rowsHeight = measuredRows.reduce((sum, row, index) =>
         sum + row.rowHeight + (index < measuredRows.length - 1 ? rowGap : 0), 0
       );
-      const summaryHeight = topY + headingLineHeight + 44 + rowsHeight + 18;
+      const summaryHeight = topY + headingLineHeight + 62 + rowsHeight + 18;
       const dividerGap = 1;
       const summaryTop = chartImg.height + dividerGap;
 
@@ -667,7 +713,18 @@
       ctx.font = '500 22px DM Sans, sans-serif';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
-      let cursorY = summaryTop + topY + headingLineHeight + 20;
+
+      const headerY = summaryTop + topY + headingLineHeight + 12;
+      ctx.fillStyle = '#64748b';
+      ctx.font = '500 13px DM Mono, monospace';
+      ctx.textAlign = 'right';
+      ctx.fillText('Expected', scoreColumnLeft + scoreColWidth, headerY);
+      ctx.fillText('Actual', scoreColumnLeft + scoreColWidth + scoreColGap + scoreColWidth, headerY);
+
+      ctx.fillStyle = '#475569';
+      ctx.font = '500 22px DM Sans, sans-serif';
+      ctx.textAlign = 'left';
+      let cursorY = summaryTop + topY + headingLineHeight + 34;
       measuredRows.forEach(row => {
         const textBlockHeight = row.lines.length * textLineHeight;
         const lineStartY = cursorY + ((row.rowHeight - textBlockHeight) / 2) + (textLineHeight / 2);
@@ -675,22 +732,39 @@
           ctx.fillText(line, summaryLeft, lineStartY + (index * textLineHeight));
         });
 
-        const circle = getScoreCircleStyle(row.entry.score);
-        const circleX = scoreColumnLeft + scoreColWidth - (scoreCircleSize / 2);
+        const expectedCircle = getScoreCircleStyle(row.entry.expected);
+        const expectedCircleX = scoreColumnLeft + scoreColWidth - (scoreCircleSize / 2);
+        const actualCircle = getScoreCircleStyle(row.entry.actual);
+        const actualCircleX = scoreColumnLeft + scoreColWidth + scoreColGap + scoreColWidth - (scoreCircleSize / 2);
         const circleY = cursorY + (row.rowHeight / 2);
-        ctx.fillStyle = circle.fill;
-        ctx.strokeStyle = circle.stroke;
+
+        ctx.fillStyle = expectedCircle.fill;
+        ctx.strokeStyle = expectedCircle.stroke;
         ctx.lineWidth = 1;
         ctx.beginPath();
-        ctx.arc(circleX, circleY, scoreCircleSize / 2, 0, Math.PI * 2);
+        ctx.arc(expectedCircleX, circleY, scoreCircleSize / 2, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
 
-        ctx.fillStyle = circle.text;
+        ctx.fillStyle = expectedCircle.text;
         ctx.font = '600 16px DM Mono, monospace';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(row.entry.score || '-', circleX, circleY);
+        ctx.fillText(row.entry.expected || '-', expectedCircleX, circleY);
+
+        ctx.fillStyle = actualCircle.fill;
+        ctx.strokeStyle = actualCircle.stroke;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(actualCircleX, circleY, scoreCircleSize / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = actualCircle.text;
+        ctx.font = '600 16px DM Mono, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(row.entry.actual || '-', actualCircleX, circleY);
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = '#475569';
