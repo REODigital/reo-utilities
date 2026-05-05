@@ -272,7 +272,8 @@
       <div class="field-group">
         <label>Role</label>
         <select id="role-select">
-          <option value="dev">CRO Developer</option>
+          <option value="cro-dev">CRO Developer</option>
+          <option value="cms-dev">CMS Developer</option>
           <option value="qa">QA</option>
           <option value="analytics">Analytics</option>
           <option value="cx">CX</option>
@@ -321,7 +322,8 @@
     const VALUES = ['Ownership','Client-First','Clarity','Collaboration','Curiosity','Craft','Adaptability'];
 
     const SKILLS = {
-      dev: ['Experiment Setup & Execution','CRO Front-End Implementation','Code Quality for Experiments','Complex Test Delivery','CRO Tooling & Integration','Debugging & Troubleshooting','Technical Innovation in CRO','Refactoring & Tech Debt Reduction','QA & Attention to Detail' ],
+      'cro-dev': ['Experiment Setup & Execution','CRO Front-End Implementation','Code Quality for Experiments','Complex Test Delivery','CRO Tooling & Integration','Debugging & Troubleshooting','Technical Innovation in CRO','Refactoring & Tech Debt Reduction','QA & Attention to Detail' ],
+      'cms-dev': ['CMS Platform Knowledge','Theme & Template Development','Front-End Implementation','Plugin & Extension Development','Content Modelling & Architecture','CMS Integration & APIs','Performance Optimisation','Debugging & Troubleshooting','Code Quality & Standards','Security','Accessibility'],
       qa: ['Experiment Test Planning','CRO Experiment QA Execution','Tracking & Analytics Validation','CRO Tooling & Environments','Defect Identification & Reporting','Debugging & Problem Solving','Cross‑Browser / Device Testing','Risk & Release Readiness','Collaboration & Communication'],
       analytics: ['Auditing','Implementation','Configuration','Reporting & Insight','Troubleshooting','GA4','GTM','DX','Other analytics tools', 'Other tag management tools'],
       cx: ['Programme & Delivery Management','Stakeholder & Account Management','Reporting & Communication','Research & Discovery','Test Design & Statistical Rigour','Tooling & Technical Proficiency','Feedback & Knowledge Sharing','Prioritisation & Strategic Thinking'],
@@ -331,7 +333,7 @@
 
     // Expected benchmark scores by role and level. Each array corresponds to items in the role.
     const EXPECTED_SCORES_BY_ROLE_LEVEL = {
-      dev: {
+      'cro-dev': {
         values: {
           standard: [3, 3, 3, 3, 3, 3, 3],
           senior: [4, 4, 4, 4, 4, 4, 4],
@@ -341,6 +343,18 @@
           standard: [3, 3, 3, 3, 3, 3, 3, 3, 3],
           senior: [4, 4, 4, 4, 4, 4, 4, 4, 4],
           lead: [5, 5, 5, 5, 5, 5, 5, 5, 5],
+        },
+      },
+      'cms-dev': {
+        values: {
+          standard: [3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5],
+        },
+        skills: {
+          standard: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
+          senior: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+          lead: [5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5],
         },
       },
       qa: {
